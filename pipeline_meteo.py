@@ -83,7 +83,7 @@ for v in villes:
         print(f" Erreur pour {nom}")
 
     sleep(1)  
-
+df = pd.DataFrame(donnees_meteo)
 
 # Nettoyage des donées avec Numpy
 

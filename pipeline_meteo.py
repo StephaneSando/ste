@@ -64,30 +64,33 @@ villes = [
 donnees_meteo = []
 
 for v in villes:
-    nom = v["nom"]
-    lat = v["lat"]
-    lon = v["lon"]
+    try:
+        nom = v["nom"]
+        lat = v["lat"]
+        lon = v["lon"]
 
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
 
-    response = requests.get(url)
+        response = requests.get(url, timeout=10)
 
-    if response.status_code == 200:
-        data = response.json();
-        meteo = data.get("current_weather",{})
-        meteo["ville"] = nom
-        meteo["date_recolte"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if response.status_code == 200:
+            data = response.json();
+            meteo = data.get("current_weather",{})
+            meteo["ville"] = nom
+            meteo["date_recolte"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        donnees_meteo.append(meteo)
-    else:
-        print(f" Erreur pour {nom}")
-
-    sleep(1)  
+            donnees_meteo.append(meteo)
+        else:
+            print(f" Erreur pour {nom}")
+        sleep(0.2)  
+    except requests.exceptions.RequestException as e:
+        print(f"Erreur réseau pour {ville['name']}: {e}")
+        sleep(1)
+        continue
+        
 df = pd.DataFrame(donnees_meteo)
 
 # Nettoyage des donées avec Numpy
-
-
 
 print("Valeurs manquantes par colonne :")
 print(df.isnull().sum())

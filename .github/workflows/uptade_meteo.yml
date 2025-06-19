@@ -26,7 +26,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Exécuter le script de mise à jour
-        run: python update_meteo.py
+        run: python pipeline_meteo.py
 
       - name: Commit et push de la base mise à jour
         run: |

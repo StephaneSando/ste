@@ -1,13 +1,24 @@
 import requests
-import json
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+import pandas as pd
 from datetime import datetime
-import numpy as np
-import os
+import sqlite3
 
-import pandas as pd 
-from time import sleep
+# Configuration de session avec retries
+session = requests.Session()
+retries = Retry(
+    total=5,
+    backoff_factor=1.5,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["GET"]
+)
+adapter = HTTPAdapter(max_retries=retries)
+session.mount("http://", adapter)
+session.mount("https://", adapter)
 
-# Mes 50 villes de france
+# Liste des 50 villes
 villes = [
     {"nom": "Paris", "lat": 48.8566, "lon": 2.3522},
     {"nom": "Marseille", "lat": 43.2965, "lon": 5.3698},
@@ -59,58 +70,46 @@ villes = [
     {"nom": "Calais", "lat": 50.9513, "lon": 1.8587}
 ]
 
-
-# récupération des donées dans le df
 donnees_meteo = []
 
 for v in villes:
     nom = v["nom"]
     lat = v["lat"]
     lon = v["lon"]
-
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
 
-    response = requests.get(url, timeout=10)
+    try:
+        response = session.get(url, timeout=30)
+        response.raise_for_status()
 
-    if response.status_code == 200:
-        data = response.json();
-        meteo = data.get("current_weather",{})
+        data = response.json()
+        meteo = data.get("current_weather", {})
         meteo["ville"] = nom
         meteo["date_recolte"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         donnees_meteo.append(meteo)
-    else:
-        print(f" Erreur pour {nom}")
 
-    sleep(1)  
+    except requests.exceptions.RequestException as e:
+        print(f" Erreur pour {nom} : {e}")
 
-    df = pd.DataFrame(donnees_meteo)
+# Création du DataFrame après la boucle
+df = pd.DataFrame(donnees_meteo)
 
-
-# Nettoyage des donées avec Numpy
-
+# Nettoyage des données
 print("Valeurs manquantes par colonne :")
 print(df.isnull().sum())
 
-df = df.dropna(subset=['temperature'])
-
-print(f"Nombre de doublons avant suppression : {df.duplicated().sum()}")
+df = df.dropna(subset=["temperature"])
 df = df.drop_duplicates()
-print(f"Nombre de doublons après suppression : {df.duplicated().sum()}")
 
-df['date_recolte'] = pd.to_datetime(df['date_recolte'], errors='coerce')
-
-df = df.dropna(subset=['date_recolte'])
+df["date_recolte"] = pd.to_datetime(df["date_recolte"], errors="coerce")
+df = df.dropna(subset=["date_recolte"])
 
 print(f"Données nettoyées : {df.shape[0]} lignes, {df.shape[1]} colonnes")
 print(df.head())
 
-#charger les données dans ma base sqllite
+# Enregistrement en base SQLite
+conn = sqlite3.connect("meteo_data.db")
+df.to_sql("meteo", conn, if_exists="append", index=False)
+conn.close()
 
-import sqlite3
-
-conn = sqlite3.connect('meteo_data.db')
-
-df.to_sql('meteo', conn, if_exists='append', index=False)
-
-print(" Données chargées dans la nvl base SQLite 'meteo_data.db' table 'meteo'.")
+print("Données chargées dans la base SQLite 'meteo_data.db', table 'meteo'.")

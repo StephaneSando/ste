@@ -37,6 +37,9 @@ jobs:
         git config --local user.email "github-actions@github.com"
         git add meteo_data.db
         git commit -m "Mise à jour automatique de meteo_data.db via GitHub Actions" || echo "Aucun changement à valider"
+
+    - name: Liste des fichiers suivis
+      run: git ls-files
         
     - name: push change
       uses: ad-m/github-push-action@v0.6.0

@@ -25,6 +25,12 @@ jobs:
     - name: Exécuter le pipeline météo
       run: python pipeline_meteo.py
 
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false  # Utiliser ton PAT à la place du GITHUB_TOKEN
+        fetch-depth: 0 
+
     - name: commit files
       run: |
         git config --local user.name "GitHub Actions"
@@ -37,3 +43,4 @@ jobs:
       with:
         github_token: ${{ secrets.GH_PAT }}
         branch: main
+        force: true

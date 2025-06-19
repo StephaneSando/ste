@@ -25,10 +25,10 @@ jobs:
     - name: Exécuter le pipeline météo
       run: python pipeline_meteo.py
 
-    - name: Push updated database to GitHub
+    - name: Push meteo_data.db to GitHub
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@github.com"
         git add meteo_data.db
-        git commit -m " Mise à jour automatique de meteo_data.db via GitHub Actions" || echo "Rien à commit"
-        git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/StephaneSando/ste.git HEAD:main
+        git commit -m "Mise à jour automatique de meteo_data.db via GitHub Actions" || echo "Rien à valider"
+        git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/StephaneSando/ste.git

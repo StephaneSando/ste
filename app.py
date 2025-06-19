@@ -27,12 +27,12 @@ df_ville = df[df['ville'] == ville_select]
 
 
 # Les KPIs
-st.subheader(f"Indicateurs météo pour {ville_select}")
+st.subheader(f"Indicateur météo pour {ville_select}")
 
 col1, col2, col3, col4 = st.columns(4)
 
 # Température
-col1.metric(" Moy. Température (°C)", f"{df_ville['temperature'].mean():.1f}")
+col1.metric(" Moy. Temperature (°C)", f"{df_ville['temperature'].mean():.1f}")
 col2.metric(" Max / Min Temp (°C)", 
             f"{df_ville['temperature'].max():.1f} / {df_ville['temperature'].min():.1f}")
 
@@ -48,19 +48,19 @@ st.subheader(f"Données météo détaillées pour {ville_select}")
 st.dataframe(df_ville.sort_values("time", ascending=False), use_container_width=True)
 
 #### Graph
-st.subheader("Température au fil du temps")
+st.subheader("Temperature au fil du temps")
 st.line_chart(df_ville.set_index("time")["temperature"])
 
 with st.expander(" Voir les vents et météo détaillée"):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("** Vitesse du vent (km/h)**")
+        st.markdown("Vitesse du vent (km/h)")
         st.line_chart(df_ville.set_index("time")["windspeed"])
 
     with col2:
-        st.markdown("** Codes météo (weathercode)**")
+        st.markdown(" Codes météo (weathercode)")
         st.bar_chart(df_ville["weathercode"].value_counts())
 
 # date de la mise à jour
-st.caption(f"Dernière mise à jour : {df['date_recolte'].max()}")
+st.caption(f"Derniere mise à jour : {df['date_recolte'].max()}")

@@ -2,8 +2,8 @@ name: Mettre à jour la base météo chaque heure
 
 on:
   schedule:
-    - cron: '0 * * * *'  # chaque heure
-  workflow_dispatch:      # exécutable manuellement
+    - cron: '0 * * * *'  
+  workflow_dispatch:      
 
 jobs:
   update-meteo:
@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Exécuter le script de mise à jour
+      - name: Script de mise à jour
         run: python pipeline_meteo.py
 
       - name: Commit et push de la base mise à jour

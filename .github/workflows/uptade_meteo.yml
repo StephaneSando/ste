@@ -2,7 +2,7 @@ name: Mettre à jour la base météo chaque heure
 
 on:
   schedule:
-    - cron: '0 * * * *'  
+    - cron: '0,30 * * * *'  
   workflow_dispatch:      
 
 jobs:

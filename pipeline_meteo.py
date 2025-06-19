@@ -112,4 +112,4 @@ conn = sqlite3.connect("meteo_data.db")
 df.to_sql("meteo", conn, if_exists="append", index=False)
 conn.close()
 
-print("Base de données mise à jour :", os.path.getsize("meteo_data.db"), "octets")
+print("Données chargées dans la base SQLite 'meteo_data.db', table 'meteo'.")

@@ -16,7 +16,7 @@ def load_data():
 df = load_data()
 
 # Titre
-st.title("Visualisation des données météo en France")
+st.title("Visualisation des données météo en France (UTC) ")
 
 # Sélection de la ville
 villes = sorted(df['ville'].unique())
